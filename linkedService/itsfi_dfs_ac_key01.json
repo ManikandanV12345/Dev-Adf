@@ -1,0 +1,18 @@
+{
+	"name": "itsfi_dfs_ac_key01",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://itsfidfs.dfs.core.windows.net",
+			"accountKey": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "blobdfs"
+			}
+		}
+	}
+}
