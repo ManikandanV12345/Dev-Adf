@@ -31,7 +31,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "Set variable1",
+						"activity": "Web2",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -53,7 +53,7 @@
 							"json": {
 								"type": "String",
 								"value": {
-									"value": "@json(replace(variables('json'),'\\',''))",
+									"value": "@json(replace(string(activity('Web2').output.tables[0].rows),'\\',''))",
 									"type": "Expression"
 								}
 							}
@@ -64,46 +64,6 @@
 					"dataset": {
 						"referenceName": "AzureSqlTable1",
 						"type": "DatasetReference"
-					}
-				}
-			},
-			{
-				"name": "Set variable1",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Web2",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "var",
-					"value": {
-						"value": "@activity('Web2').output.tables[0].rows",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Set variable2",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Set variable1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "json",
-					"value": {
-						"value": "@replace(string(variables('var')),'\\','')",
-						"type": "Expression"
 					}
 				}
 			}
