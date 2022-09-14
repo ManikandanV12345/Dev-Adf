@@ -15,7 +15,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"url": "https://api.loganalytics.io/v1/workspaces/53825fbd-cfe9-43ac-8639-a5db7dd2e6b1/query?query=ADFTriggerRun",
+					"url": "https://api.loganalytics.io/v1/workspaces/53825fbd-cfe9-43ac-8639-a5db7dd2e6b1/query?query=ADFPipelineRun | where RunId =='3d0e6918-0981-40a4-b1ce-ec6430bd5dfb' | extend PackedRecord = pack_all() | summarize Result = make_list(PackedRecord)",
 					"method": "GET",
 					"headers": {
 						"Headers": "Accept: application/json"
@@ -23,6 +23,87 @@
 					"authentication": {
 						"type": "MSI",
 						"resource": "https://api.loganalytics.io"
+					}
+				}
+			},
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[uspCustomerInfo]",
+						"storedProcedureParameters": {
+							"json": {
+								"type": "String",
+								"value": {
+									"value": "@json(replace(variables('json'),'\\',''))",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Web1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "var",
+					"value": {
+						"value": "@activity('Web1').output.tables[0].rows",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set variable2",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "json",
+					"value": {
+						"value": "@replace(string(variables('var')),'\\','')",
+						"type": "Expression"
 					}
 				}
 			}
