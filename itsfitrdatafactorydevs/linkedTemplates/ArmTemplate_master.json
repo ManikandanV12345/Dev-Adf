@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "itsfitrdatafactorydevs"
 		},
+		"Oracle1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Oracle1'"
+		},
 		"itsfi_sqlmi_dataframework_key01_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'itsfi_sqlmi_dataframework_key01'"
@@ -14,6 +18,18 @@
 		"AzureKeyVault1_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://sqlkyvault.vault.azure.net/"
+		},
+		"itsfi_blob_ac_key01_sasUri": {
+			"type": "secureString",
+			"metadata": "Secure string for 'sasUri' of 'itsfi_blob_ac_key01'"
+		},
+		"itsfi_blob_ac_key01_properties_typeProperties_sasToken_secretName": {
+			"type": "string",
+			"defaultValue": "Blob1"
+		},
+		"itsfi_dfs_ac_key01_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://itsfidfs.dfs.core.windows.net"
 		},
 		"containerUri": {
 			"type": "string",
@@ -42,11 +58,23 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"Oracle1_connectionString": {
+						"value": "[parameters('Oracle1_connectionString')]"
+					},
 					"itsfi_sqlmi_dataframework_key01_connectionString": {
 						"value": "[parameters('itsfi_sqlmi_dataframework_key01_connectionString')]"
 					},
 					"AzureKeyVault1_properties_typeProperties_baseUrl": {
 						"value": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
+					},
+					"itsfi_blob_ac_key01_sasUri": {
+						"value": "[parameters('itsfi_blob_ac_key01_sasUri')]"
+					},
+					"itsfi_blob_ac_key01_properties_typeProperties_sasToken_secretName": {
+						"value": "[parameters('itsfi_blob_ac_key01_properties_typeProperties_sasToken_secretName')]"
+					},
+					"itsfi_dfs_ac_key01_properties_typeProperties_url": {
+						"value": "[parameters('itsfi_dfs_ac_key01_properties_typeProperties_url')]"
 					}
 				}
 			},

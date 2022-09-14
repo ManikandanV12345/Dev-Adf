@@ -5,11 +5,23 @@
 		"factoryName": {
 			"value": "itsfitrdatafactorydevs"
 		},
+		"Oracle1_connectionString": {
+			"value": ""
+		},
 		"itsfi_sqlmi_dataframework_key01_connectionString": {
 			"value": ""
 		},
 		"AzureKeyVault1_properties_typeProperties_baseUrl": {
 			"value": "https://sqlkyvault.vault.azure.net/"
+		},
+		"itsfi_blob_ac_key01_sasUri": {
+			"value": ""
+		},
+		"itsfi_blob_ac_key01_properties_typeProperties_sasToken_secretName": {
+			"value": "Blob1"
+		},
+		"itsfi_dfs_ac_key01_properties_typeProperties_url": {
+			"value": "https://itsfidfs.dfs.core.windows.net"
 		}
 	}
 }
