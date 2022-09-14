@@ -20,12 +20,6 @@
 					"headers": {
 						"Headers": "Accept: application/json"
 					},
-					"datasets": [
-						{
-							"referenceName": "AzureSqlTable1",
-							"type": "DatasetReference"
-						}
-					],
 					"authentication": {
 						"type": "MSI",
 						"resource": "https://api.loganalytics.io"
