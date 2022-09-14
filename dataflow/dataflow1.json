@@ -13,41 +13,27 @@
 				}
 			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "flatten1"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
-				"          TenantId as string,",
-				"          SourceSystem as string,",
-				"          TimeGenerated as timestamp,",
-				"          ResourceId as string,",
-				"          OperationName as string,",
-				"          Category as string,",
-				"          CorrelationId as string,",
-				"          Level as string,",
-				"          Location as string,",
-				"          Tags as string,",
-				"          Status as string,",
-				"          UserProperties as string,",
-				"          Input as string,",
-				"          Output as string,",
-				"          ErrorCode as string,",
-				"          ErrorMessage as string,",
-				"          Annotations as string,",
-				"          EventMessage as string,",
-				"          Start as timestamp,",
-				"          TriggerId as string,",
-				"          TriggerName as string,",
-				"          TriggerType as string,",
-				"          TriggerEvent as string,",
-				"          TriggerFailureType as string,",
-				"          Parameters as string,",
-				"          SystemParametersType as string,",
-				"          {_ResourceId} as string",
+				"          {_id} as long,",
+				"          log as string",
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> source1"
+				"     format: 'table') ~> source1",
+				"source1 foldDown(unroll(, log),",
+				"     mapColumn(",
+				"          {_id},",
+				"          log",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1"
 			]
 		}
 	}
