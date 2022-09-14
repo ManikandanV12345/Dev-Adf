@@ -1,0 +1,54 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          TenantId as string,",
+				"          SourceSystem as string,",
+				"          TimeGenerated as timestamp,",
+				"          ResourceId as string,",
+				"          OperationName as string,",
+				"          Category as string,",
+				"          CorrelationId as string,",
+				"          Level as string,",
+				"          Location as string,",
+				"          Tags as string,",
+				"          Status as string,",
+				"          UserProperties as string,",
+				"          Input as string,",
+				"          Output as string,",
+				"          ErrorCode as string,",
+				"          ErrorMessage as string,",
+				"          Annotations as string,",
+				"          EventMessage as string,",
+				"          Start as timestamp,",
+				"          TriggerId as string,",
+				"          TriggerName as string,",
+				"          TriggerType as string,",
+				"          TriggerEvent as string,",
+				"          TriggerFailureType as string,",
+				"          Parameters as string,",
+				"          SystemParametersType as string,",
+				"          {_ResourceId} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1"
+			]
+		}
+	}
+}
