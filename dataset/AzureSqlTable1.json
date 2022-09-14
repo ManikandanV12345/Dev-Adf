@@ -1,0 +1,125 @@
+{
+	"name": "AzureSqlTable1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "itsfi_sqlmi_dataframework_key01",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "TenantId",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SourceSystem",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TimeGenerated",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "ResourceId",
+				"type": "nvarchar"
+			},
+			{
+				"name": "OperationName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Category",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CorrelationId",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Level",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Location",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Tags",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Status",
+				"type": "nvarchar"
+			},
+			{
+				"name": "UserProperties",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Input",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Output",
+				"type": "varchar"
+			},
+			{
+				"name": "ErrorCode",
+				"type": "varchar"
+			},
+			{
+				"name": "ErrorMessage",
+				"type": "varchar"
+			},
+			{
+				"name": "Annotations",
+				"type": "varchar"
+			},
+			{
+				"name": "EventMessage",
+				"type": "varchar"
+			},
+			{
+				"name": "Start",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "TriggerId",
+				"type": "varchar"
+			},
+			{
+				"name": "TriggerName",
+				"type": "varchar"
+			},
+			{
+				"name": "TriggerType",
+				"type": "varchar"
+			},
+			{
+				"name": "TriggerEvent",
+				"type": "varchar"
+			},
+			{
+				"name": "TriggerFailureType",
+				"type": "varchar"
+			},
+			{
+				"name": "Parameters",
+				"type": "varchar"
+			},
+			{
+				"name": "SystemParametersType",
+				"type": "varchar"
+			},
+			{
+				"name": "_ResourceId",
+				"type": "varchar"
+			}
+		]
+	}
+}
