@@ -7,10 +7,6 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "itsfi-findata-adf-radev"
 		},
-		"AzureKeyVault2_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://sqlkyvaults.vault.azure.net/"
-		},
 		"itsfi_blob_ac_key01_properties_typeProperties_sasUri_secretName": {
 			"type": "string",
 			"defaultValue": "blob"
@@ -22,6 +18,10 @@
 		"itsfi_sqlmi_dataframework_key01_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "sqlsecret"
+		},
+		"AzureKeyVault2_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://sqlkyvaults.vault.azure.net/"
 		}
 	},
 	"variables": {
@@ -71,7 +71,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"url": "https://management.azure.com/subscriptions/5274f02e-4f75-4111-8181-64bc40c6cad8/resourceGroups/ITSTR-Dataplatform-Dev/providers/Microsoft.DataFactory/factories/itsfitrdatafactorydevs/pipelines/Wait/createRun?api-version=2018-06-01",
+							"url": "https://management.azure.com/subscriptions/7f9bae16-fb73-49a9-b8c8-e9dc992ebdcd/resourceGroups/ITSTR-Dataplatform-Dev/providers/Microsoft.DataFactory/factories/itsfi-findata-adf-radev/pipelines/Wait/createRun?api-version=2018-06-01",
 							"method": "POST",
 							"headers": {},
 							"body": {},
@@ -87,19 +87,6 @@
 					"cancelAfter": {}
 				},
 				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureKeyVault2')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureKeyVault",
-				"typeProperties": {
-					"baseUrl": "[parameters('AzureKeyVault2_properties_typeProperties_baseUrl')]"
-				}
 			},
 			"dependsOn": []
 		},
@@ -169,6 +156,24 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault2')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureKeyVault2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"keyvault": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('AzureKeyVault2_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
@@ -295,7 +300,10 @@
 						"type": "varchar"
 					}
 				],
-				"typeProperties": {}
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Logs"
+				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/itsfi_sqlmi_dataframework_key01')]"
@@ -320,10 +328,10 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"url": "https://api.loganalytics.io/v1/workspaces/53825fbd-cfe9-43ac-8639-a5db7dd2e6b1/query?query=ADFPipelineRun | where RunId =='3d0e6918-0981-40a4-b1ce-ec6430bd5dfb' | extend PackedRecord = pack_all() | summarize Result = make_list(PackedRecord)",
+							"url": "https://api.loganalytics.io/v1/workspaces/762a5982-5ada-4e1a-b282-617151d2a2f7/query?query=AzureDiagnostics | extend PackedRecord = pack_all() | summarize Result = make_list(PackedRecord)",
 							"method": "GET",
 							"headers": {
-								"Headers": "Accept: application/json"
+								"content-type": "application/json; charset=utf-8"
 							},
 							"authentication": {
 								"type": "MSI",
@@ -332,11 +340,31 @@
 						}
 					},
 					{
+						"name": "Set variable1",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Web2",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "json",
+							"value": {
+								"value": "@(replace(string(activity('Web2').output.tables[0].rows[0]),'\\','')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
 						"name": "Lookup1",
 						"type": "Lookup",
 						"dependsOn": [
 							{
-								"activity": "Web2",
+								"activity": "Set variable1",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -353,12 +381,12 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[dbo].[uspCustomerInfo]",
+								"sqlReaderStoredProcedureName": "[[dbo].[test]",
 								"storedProcedureParameters": {
-									"json": {
+									"logs": {
 										"type": "String",
 										"value": {
-											"value": "@json(replace(string(activity('Web2').output.tables[0].rows),'\\',''))",
+											"value": "@replace(variables('json'),'\\','')",
 											"type": "Expression"
 										}
 									}

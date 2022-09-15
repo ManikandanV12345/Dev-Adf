@@ -50,9 +50,6 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"AzureKeyVault2_properties_typeProperties_baseUrl": {
-						"value": "[parameters('AzureKeyVault2_properties_typeProperties_baseUrl')]"
-					},
 					"itsfi_blob_ac_key01_properties_typeProperties_sasUri_secretName": {
 						"value": "[parameters('itsfi_blob_ac_key01_properties_typeProperties_sasUri_secretName')]"
 					},
@@ -61,6 +58,9 @@
 					},
 					"itsfi_sqlmi_dataframework_key01_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('itsfi_sqlmi_dataframework_key01_properties_typeProperties_connectionString_secretName')]"
+					},
+					"AzureKeyVault2_properties_typeProperties_baseUrl": {
+						"value": "[parameters('AzureKeyVault2_properties_typeProperties_baseUrl')]"
 					}
 				}
 			},
