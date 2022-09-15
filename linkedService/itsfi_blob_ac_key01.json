@@ -1,19 +1,18 @@
 {
 	"name": "itsfi_blob_ac_key01",
-	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"annotations": [],
 		"type": "AzureBlobStorage",
 		"typeProperties": {
-			"sasUri": "https://itsdevblob.blob.core.windows.net/landingzone",
-			"sasToken": {
+			"sasUri": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
-					"referenceName": "AzureKeyVault1",
+					"referenceName": "AzureKeyVault2",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "Blob1"
+				"secretName": "blob"
 			}
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }
