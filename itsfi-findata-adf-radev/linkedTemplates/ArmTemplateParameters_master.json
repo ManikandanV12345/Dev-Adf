@@ -5,6 +5,12 @@
 		"factoryName": {
 			"value": "itsfi-findata-adf-radev"
 		},
+		"AzureSqlDatabase1_connectionString": {
+			"value": ""
+		},
+		"AzureKeyVault2_properties_typeProperties_baseUrl": {
+			"value": "https://sqlkyvaults.vault.azure.net/"
+		},
 		"itsfi_blob_ac_key01_properties_typeProperties_sasUri_secretName": {
 			"value": "blob"
 		},
@@ -13,9 +19,6 @@
 		},
 		"itsfi_sqlmi_dataframework_key01_properties_typeProperties_connectionString_secretName": {
 			"value": "sqlsecret"
-		},
-		"AzureKeyVault2_properties_typeProperties_baseUrl": {
-			"value": "https://sqlkyvaults.vault.azure.net/"
 		},
 		"containerUri": {
 			"value": ""
