@@ -4,7 +4,7 @@
 		"annotations": [],
 		"type": "AzureKeyVault",
 		"typeProperties": {
-			"baseUrl": "https://sqlkyvault.vault.azure.net/"
+			"baseUrl": "https://sqlkyvaults.vault.azure.net/"
 		}
 	}
 }
