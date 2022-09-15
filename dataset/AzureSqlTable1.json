@@ -120,6 +120,10 @@
 				"name": "_ResourceId",
 				"type": "varchar"
 			}
-		]
+		],
+		"typeProperties": {
+			"schema": "LoadControl",
+			"table": "CuratedZone_Log"
+		}
 	}
 }
