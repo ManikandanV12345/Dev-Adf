@@ -120,6 +120,10 @@
 				"name": "_ResourceId",
 				"type": "varchar"
 			}
-		]
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Logs"
+		}
 	}
 }
