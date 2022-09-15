@@ -4,14 +4,14 @@
 		"annotations": [],
 		"type": "AzureBlobFS",
 		"typeProperties": {
-			"url": "https://itsfidfs.dfs.core.windows.net",
+			"url": "https://itsfiadls.dfs.core.windows.net",
 			"accountKey": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
-					"referenceName": "AzureKeyVault1",
+					"referenceName": "AzureKeyVault2",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "blobdfs"
+				"secretName": "adls1"
 			}
 		}
 	}
