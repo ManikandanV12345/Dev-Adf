@@ -1,11 +1,18 @@
 {
-	"name": "pipeline1",
+	"name": "pipeline1_copy1",
 	"properties": {
 		"activities": [
 			{
 				"name": "Web2",
 				"type": "WebActivity",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "mani_copy1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -15,7 +22,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"url": "https://api.loganalytics.io/v1/workspaces/762a5982-5ada-4e1a-b282-617151d2a2f7/query?query=AzureDiagnostics | extend PackedRecord = pack_all() | summarize Result = make_list(PackedRecord)",
+					"url": {
+						"value": "@concat('https://api.loganalytics.io/v1/workspaces/762a5982-5ada-4e1a-b282-617151d2a2f7/query?query=ADFActivityRun | where PipelineRunId ==''',pipeline().RunId,''' | extend PackedRecord = pack_all() | summarize Result = make_list(PackedRecord)')",
+						"type": "Expression"
+					},
 					"method": "GET",
 					"headers": {
 						"content-type": "application/json; charset=utf-8"
@@ -66,6 +76,31 @@
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "mani",
+				"type": "Wait",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 60
+				}
+			},
+			{
+				"name": "mani_copy1",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "mani",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 12
 				}
 			}
 		],
