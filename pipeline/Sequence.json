@@ -41,6 +41,11 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup1').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
 					"activities": [
 						{
 							"name": "If Condition1",
@@ -82,7 +87,25 @@
 												"referenceName": "Web",
 												"type": "PipelineReference"
 											},
-											"waitOnCompletion": true
+											"waitOnCompletion": true,
+											"parameters": {
+												"SubscriptionId": {
+													"value": "@pipeline().globalParameters.Subscriptionid",
+													"type": "Expression"
+												},
+												"ResourceGrp": {
+													"value": "@pipeline().globalParameters.ResourceGrp",
+													"type": "Expression"
+												},
+												"DataFactoryName": {
+													"value": "@pipeline().DataFactory",
+													"type": "Expression"
+												},
+												"PipelineName": {
+													"value": "@variables('current')",
+													"type": "Expression"
+												}
+											}
 										}
 									}
 								]
