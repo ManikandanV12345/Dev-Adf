@@ -1,0 +1,15 @@
+{
+	"name": "DynamicKV",
+	"properties": {
+		"parameters": {
+			"VaultName": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "@{linkedService().VaultName}"
+		}
+	}
+}
