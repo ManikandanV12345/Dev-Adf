@@ -1,0 +1,30 @@
+{
+	"name": "DynamicDS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase2",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"VaultName": {
+					"value": "@dataset().Vaultname",
+					"type": "Expression"
+				},
+				"SecretName": {
+					"value": "@dataset().SecretName",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"Vaultname": {
+				"type": "String"
+			},
+			"SecretName": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
