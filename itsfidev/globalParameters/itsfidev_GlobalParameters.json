@@ -1,0 +1,10 @@
+{
+	"Subscriptionid": {
+		"type": "string",
+		"value": "7f43217e-5dd6-4b9b-8ba6-149b75296777"
+	},
+	"ResourceGrp": {
+		"type": "string",
+		"value": "itsfirsg"
+	}
+}
