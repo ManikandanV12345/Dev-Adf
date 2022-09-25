@@ -76,6 +76,39 @@
 									"value": "@AND(equals(variables('superiror'),'NONE'),not(equals(variables('current'),'NONE')))",
 									"type": "Expression"
 								},
+								"ifFalseActivities": [
+									{
+										"name": "Web_copy1",
+										"type": "ExecutePipeline",
+										"dependsOn": [],
+										"userProperties": [],
+										"typeProperties": {
+											"pipeline": {
+												"referenceName": "Web",
+												"type": "PipelineReference"
+											},
+											"waitOnCompletion": true,
+											"parameters": {
+												"SubscriptionId": {
+													"value": "@pipeline().globalParameters.Subscriptionid",
+													"type": "Expression"
+												},
+												"ResourceGrp": {
+													"value": "@pipeline().globalParameters.ResourceGrp",
+													"type": "Expression"
+												},
+												"DataFactoryName": {
+													"value": "@pipeline().DataFactory",
+													"type": "Expression"
+												},
+												"PipelineName": {
+													"value": "@variables('current')",
+													"type": "Expression"
+												}
+											}
+										}
+									}
+								],
 								"ifTrueActivities": [
 									{
 										"name": "Web",
