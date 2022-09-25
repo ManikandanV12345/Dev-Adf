@@ -4,7 +4,7 @@
 		"activities": [
 			{
 				"name": "Web1",
-				"description": "{\n}",
+				"description": "",
 				"type": "WebActivity",
 				"dependsOn": [],
 				"policy": {
@@ -21,7 +21,6 @@
 						"type": "Expression"
 					},
 					"method": "POST",
-					"body": "{\"\"\n}",
 					"authentication": {
 						"type": "MSI",
 						"resource": "https://management.core.windows.net"
