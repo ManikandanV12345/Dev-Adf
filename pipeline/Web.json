@@ -16,7 +16,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"url": "https://management.azure.com/subscriptions/7f9bae16-fb73-49a9-b8c8-e9dc992ebdcd/resourceGroups/ITSTR-Dataplatform-Dev/providers/Microsoft.DataFactory/factories/itsfi-findata-adf-radev/pipelines/Wait/createRun?api-version=2018-06-01",
+					"url": {
+						"value": "@concat('https://management.azure.com/subscriptions/',pipeline().parameters.SubscriptionId,'/resourceGroups/',pipeline().parameters.ResourceGrp,'/providers/Microsoft.DataFactory/factories/',pipeline().parameters.DataFactoryName,'/pipelines/',pipeline().parameters.PipelineName,'/createRun?api-version=2018-06-01')",
+						"type": "Expression"
+					},
 					"method": "POST",
 					"authentication": {
 						"type": "MSI",
@@ -25,6 +28,20 @@
 				}
 			}
 		],
+		"parameters": {
+			"SubscriptionId": {
+				"type": "string"
+			},
+			"ResourceGrp": {
+				"type": "string"
+			},
+			"DataFactoryName": {
+				"type": "string"
+			},
+			"PipelineName": {
+				"type": "string"
+			}
+		},
 		"annotations": []
 	}
 }
