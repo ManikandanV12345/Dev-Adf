@@ -13,7 +13,12 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": [],
+				"userProperties": [
+					{
+						"name": "ActivityName",
+						"value": "Lookup1"
+					}
+				],
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
@@ -161,6 +166,36 @@
 												"type": "Expression"
 											}
 										}
+									},
+									{
+										"name": "Execute Pipeline1_copy1",
+										"type": "ExecutePipeline",
+										"dependsOn": [
+											{
+												"activity": "Web",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"userProperties": [],
+										"typeProperties": {
+											"pipeline": {
+												"referenceName": "LoggingPipeline",
+												"type": "PipelineReference"
+											},
+											"waitOnCompletion": true,
+											"parameters": {
+												"PipelineId": {
+													"value": "@pipeline().RunId",
+													"type": "Expression"
+												},
+												"Json": {
+													"value": "@activity('Web').output",
+													"type": "Expression"
+												}
+											}
+										}
 									}
 								]
 							}
@@ -205,6 +240,36 @@
 							}
 						}
 					]
+				}
+			},
+			{
+				"name": "Execute Pipeline1",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "LoggingPipeline",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"PipelineId": {
+							"value": "@pipeline().RunId",
+							"type": "Expression"
+						},
+						"Json": {
+							"value": "@activity('Lookup1').output.value",
+							"type": "Expression"
+						}
+					}
 				}
 			}
 		],
