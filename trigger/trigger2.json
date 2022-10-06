@@ -9,12 +9,6 @@
 					"referenceName": "ListeningCustomevents",
 					"type": "PipelineReference"
 				}
-			},
-			{
-				"pipelineReference": {
-					"referenceName": "DynamicPip_Parent",
-					"type": "PipelineReference"
-				}
 			}
 		],
 		"type": "CustomEventsTrigger",
