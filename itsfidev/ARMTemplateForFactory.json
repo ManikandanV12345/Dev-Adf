@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "itsfidev"
 		},
+		"AzureBlobStorage1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
+		},
 		"AzureSqlDatabase1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
@@ -38,6 +42,10 @@
 		"itsfi_sqlmi_dataframework_key01_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "sqlsecret"
+		},
+		"trigger2_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/7f43217e-5dd6-4b9b-8ba6-149b75296777/resourceGroups/itsfirsg/providers/Microsoft.EventGrid/topics/Mani"
 		}
 	},
 	"variables": {
@@ -213,6 +221,78 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ListeningCustomevents')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://manikandan.eastus-1.eventgrid.azure.net/api/events",
+							"method": "POST",
+							"headers": {},
+							"body": [
+								{
+									"id": "@{pipeline().RunId}",
+									"eventType": "PipelineFinished",
+									"subject": "myapp/pipelines/mydataset",
+									"eventTime": "@{formatDateTime(utcnow(), 's')}",
+									"data": {
+										"DataFactory": "@{pipeline().DataFactory}",
+										"PipelineName": "@{pipeline().Pipeline}",
+										"PipelineGroupId": "@{pipeline().GroupId}",
+										"PipelineTriggerId": "@{pipeline().GroupId}",
+										"PipelineTriggerName": "@{pipeline().TriggerName}",
+										"PipelineTriggerType": "@{pipeline().TriggerType}",
+										"PipelineTriggeredByPipelineName": "@{pipeline()?.TriggeredByPipelineName}",
+										"PipelineTriggeredByPipelineRunId": "@{pipeline()?.TriggeredByPipelineRunId}"
+									},
+									"dataVersion": "1.0"
+								}
+							],
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://eventgrid.azure.net/"
+							}
+						}
+					},
+					{
+						"name": "Wait1",
+						"type": "Wait",
+						"dependsOn": [
+							{
+								"activity": "Web1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 10
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LoggingPipeline')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -264,6 +344,62 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase3')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SendingtoCustomevent')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://mani.eastus-1.eventgrid.azure.net/api/events",
+							"method": "POST",
+							"headers": {},
+							"body": [
+								{
+									"id": "@{pipeline().RunId}",
+									"eventType": "copyCompleted",
+									"subject": "factories",
+									"eventTime": "@{formatDateTime(utcnow(), 's')}",
+									"data": {
+										"DataFactory": "@{pipeline().DataFactory}",
+										"PipelineName": "@{pipeline().Pipeline}",
+										"PipelineGroupId": "@{pipeline().GroupId}",
+										"PipelineTriggerId": "@{pipeline().GroupId}",
+										"PipelineTriggerName": "@{pipeline().TriggerName}",
+										"PipelineTriggerType": "@{pipeline().TriggerType}",
+										"PipelineTriggeredByPipelineName": "@{pipeline()?.TriggeredByPipelineName}",
+										"PipelineTriggeredByPipelineRunId": "@{pipeline()?.TriggeredByPipelineRunId}"
+									},
+									"dataVersion": "1.0"
+								}
+							],
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://eventgrid.azure.net/"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Sequence')]",
@@ -667,7 +803,7 @@
 							},
 							"method": "POST",
 							"headers": {},
-							"body": {},
+							"body": "{\nhkhk}",
 							"authentication": {
 								"type": "MSI",
 								"resource": "https://management.core.windows.net"
@@ -1132,6 +1268,19 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage1_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/AzureKeyVault2')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -1328,6 +1477,37 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/pipeline1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger2')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "ListeningCustomevents",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "CustomEventsTrigger",
+				"typeProperties": {
+					"subjectEndsWith": "",
+					"subjectBeginsWith": "factories",
+					"scope": "[parameters('trigger2_properties_typeProperties_scope')]",
+					"events": [
+						"copyCompleted",
+						"copySucceeded"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/ListeningCustomevents')]"
 			]
 		}
 	]

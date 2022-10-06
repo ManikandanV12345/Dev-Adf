@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "itsfidev"
 		},
+		"AzureBlobStorage1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
+		},
 		"AzureSqlDatabase1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
@@ -38,12 +42,144 @@
 		"itsfi_sqlmi_dataframework_key01_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "sqlsecret"
+		},
+		"trigger2_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/7f43217e-5dd6-4b9b-8ba6-149b75296777/resourceGroups/itsfirsg/providers/Microsoft.EventGrid/topics/Mani"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ListeningCustomevents')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://manikandan.eastus-1.eventgrid.azure.net/api/events",
+							"method": "POST",
+							"headers": {},
+							"body": [
+								{
+									"id": "@{pipeline().RunId}",
+									"eventType": "PipelineFinished",
+									"subject": "myapp/pipelines/mydataset",
+									"eventTime": "@{formatDateTime(utcnow(), 's')}",
+									"data": {
+										"DataFactory": "@{pipeline().DataFactory}",
+										"PipelineName": "@{pipeline().Pipeline}",
+										"PipelineGroupId": "@{pipeline().GroupId}",
+										"PipelineTriggerId": "@{pipeline().GroupId}",
+										"PipelineTriggerName": "@{pipeline().TriggerName}",
+										"PipelineTriggerType": "@{pipeline().TriggerType}",
+										"PipelineTriggeredByPipelineName": "@{pipeline()?.TriggeredByPipelineName}",
+										"PipelineTriggeredByPipelineRunId": "@{pipeline()?.TriggeredByPipelineRunId}"
+									},
+									"dataVersion": "1.0"
+								}
+							],
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://eventgrid.azure.net/"
+							}
+						}
+					},
+					{
+						"name": "Wait1",
+						"type": "Wait",
+						"dependsOn": [
+							{
+								"activity": "Web1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 10
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SendingtoCustomevent')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://mani.eastus-1.eventgrid.azure.net/api/events",
+							"method": "POST",
+							"headers": {},
+							"body": [
+								{
+									"id": "@{pipeline().RunId}",
+									"eventType": "copyCompleted",
+									"subject": "factories",
+									"eventTime": "@{formatDateTime(utcnow(), 's')}",
+									"data": {
+										"DataFactory": "@{pipeline().DataFactory}",
+										"PipelineName": "@{pipeline().Pipeline}",
+										"PipelineGroupId": "@{pipeline().GroupId}",
+										"PipelineTriggerId": "@{pipeline().GroupId}",
+										"PipelineTriggerName": "@{pipeline().TriggerName}",
+										"PipelineTriggerType": "@{pipeline().TriggerType}",
+										"PipelineTriggeredByPipelineName": "@{pipeline()?.TriggeredByPipelineName}",
+										"PipelineTriggeredByPipelineRunId": "@{pipeline()?.TriggeredByPipelineRunId}"
+									},
+									"dataVersion": "1.0"
+								}
+							],
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://eventgrid.azure.net/"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Wait')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -142,7 +278,7 @@
 							},
 							"method": "POST",
 							"headers": {},
-							"body": {},
+							"body": "{\nhkhk}",
 							"authentication": {
 								"type": "MSI",
 								"resource": "https://management.core.windows.net"
@@ -169,6 +305,19 @@
 					}
 				},
 				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage1_connectionString')]"
+				}
 			},
 			"dependsOn": []
 		},
@@ -430,6 +579,37 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger2')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "ListeningCustomevents",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "CustomEventsTrigger",
+				"typeProperties": {
+					"subjectEndsWith": "",
+					"subjectBeginsWith": "factories",
+					"scope": "[parameters('trigger2_properties_typeProperties_scope')]",
+					"events": [
+						"copyCompleted",
+						"copySucceeded"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/ListeningCustomevents')]"
 			]
 		},
 		{
@@ -734,401 +914,6 @@
 				"[concat(variables('factoryId'), '/datasets/AzureSqlTable3')]",
 				"[concat(variables('factoryId'), '/pipelines/LoggingPipeline')]",
 				"[concat(variables('factoryId'), '/pipelines/Web')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Web2",
-						"type": "WebActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": "https://api.loganalytics.io/v1/workspaces/762a5982-5ada-4e1a-b282-617151d2a2f7/query?query=AzureDiagnostics | extend PackedRecord = pack_all() | summarize Result = make_list(PackedRecord)",
-							"method": "GET",
-							"headers": {
-								"content-type": "application/json; charset=utf-8"
-							},
-							"authentication": {
-								"type": "MSI",
-								"resource": "https://api.loganalytics.io"
-							}
-						}
-					},
-					{
-						"name": "Lookup1",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Web2",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[dbo].[test]",
-								"storedProcedureParameters": {
-									"logs": {
-										"type": "String",
-										"value": {
-											"value": "@string(activity('Web2').output.tables[0].rows[0])",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "AzureSqlTable2",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"variables": {
-					"var": {
-						"type": "Array"
-					},
-					"json": {
-						"type": "String"
-					},
-					"va2": {
-						"type": "String"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/AzureSqlTable2')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1_copy1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Web2",
-						"type": "WebActivity",
-						"dependsOn": [
-							{
-								"activity": "mani_copy1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": {
-								"value": "@concat('https://api.loganalytics.io/v1/workspaces/762a5982-5ada-4e1a-b282-617151d2a2f7/query?query=ADFActivityRun | where PipelineRunId ==''',pipeline().RunId,''' | extend PackedRecord = pack_all() | summarize Result = make_list(PackedRecord)')",
-								"type": "Expression"
-							},
-							"method": "GET",
-							"headers": {
-								"content-type": "application/json; charset=utf-8"
-							},
-							"authentication": {
-								"type": "MSI",
-								"resource": "https://api.loganalytics.io"
-							}
-						}
-					},
-					{
-						"name": "Lookup1",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Web2",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[dbo].[test]",
-								"storedProcedureParameters": {
-									"logs": {
-										"type": "String",
-										"value": {
-											"value": "@string(activity('Web2').output.tables[0].rows[0])",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "AzureSqlTable2",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "mani",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": 60
-						}
-					},
-					{
-						"name": "mani_copy1",
-						"type": "Wait",
-						"dependsOn": [
-							{
-								"activity": "mani",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": 12
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"variables": {
-					"var": {
-						"type": "Array"
-					},
-					"json": {
-						"type": "String"
-					},
-					"va2": {
-						"type": "String"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/AzureSqlTable2')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "itsfi_sqlmi_dataframework_key01",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "TenantId",
-						"type": "nvarchar"
-					},
-					{
-						"name": "SourceSystem",
-						"type": "nvarchar"
-					},
-					{
-						"name": "TimeGenerated",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ResourceId",
-						"type": "nvarchar"
-					},
-					{
-						"name": "OperationName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Category",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CorrelationId",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Level",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Location",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Tags",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Status",
-						"type": "nvarchar"
-					},
-					{
-						"name": "UserProperties",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Input",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Output",
-						"type": "varchar"
-					},
-					{
-						"name": "ErrorCode",
-						"type": "varchar"
-					},
-					{
-						"name": "ErrorMessage",
-						"type": "varchar"
-					},
-					{
-						"name": "Annotations",
-						"type": "varchar"
-					},
-					{
-						"name": "EventMessage",
-						"type": "varchar"
-					},
-					{
-						"name": "Start",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "TriggerId",
-						"type": "varchar"
-					},
-					{
-						"name": "TriggerName",
-						"type": "varchar"
-					},
-					{
-						"name": "TriggerType",
-						"type": "varchar"
-					},
-					{
-						"name": "TriggerEvent",
-						"type": "varchar"
-					},
-					{
-						"name": "TriggerFailureType",
-						"type": "varchar"
-					},
-					{
-						"name": "Parameters",
-						"type": "varchar"
-					},
-					{
-						"name": "SystemParametersType",
-						"type": "varchar"
-					},
-					{
-						"name": "_ResourceId",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "LoadControl",
-					"table": "CuratedZone_Log"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/itsfi_sqlmi_dataframework_key01')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DynamicDS')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase2",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"VaultName": {
-							"value": "@dataset().Vaultname",
-							"type": "Expression"
-						},
-						"SecretName": {
-							"value": "@dataset().SecretName",
-							"type": "Expression"
-						}
-					}
-				},
-				"parameters": {
-					"Vaultname": {
-						"type": "String"
-					},
-					"SecretName": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase2')]"
 			]
 		}
 	]

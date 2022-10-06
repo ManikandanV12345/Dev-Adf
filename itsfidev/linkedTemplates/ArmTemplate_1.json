@@ -13,6 +13,393 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web2",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://api.loganalytics.io/v1/workspaces/762a5982-5ada-4e1a-b282-617151d2a2f7/query?query=AzureDiagnostics | extend PackedRecord = pack_all() | summarize Result = make_list(PackedRecord)",
+							"method": "GET",
+							"headers": {
+								"content-type": "application/json; charset=utf-8"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://api.loganalytics.io"
+							}
+						}
+					},
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Web2",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[dbo].[test]",
+								"storedProcedureParameters": {
+									"logs": {
+										"type": "String",
+										"value": {
+											"value": "@string(activity('Web2').output.tables[0].rows[0])",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSqlTable2",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"variables": {
+					"var": {
+						"type": "Array"
+					},
+					"json": {
+						"type": "String"
+					},
+					"va2": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1_copy1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web2",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "mani_copy1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "@concat('https://api.loganalytics.io/v1/workspaces/762a5982-5ada-4e1a-b282-617151d2a2f7/query?query=ADFActivityRun | where PipelineRunId ==''',pipeline().RunId,''' | extend PackedRecord = pack_all() | summarize Result = make_list(PackedRecord)')",
+								"type": "Expression"
+							},
+							"method": "GET",
+							"headers": {
+								"content-type": "application/json; charset=utf-8"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://api.loganalytics.io"
+							}
+						}
+					},
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Web2",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[dbo].[test]",
+								"storedProcedureParameters": {
+									"logs": {
+										"type": "String",
+										"value": {
+											"value": "@string(activity('Web2').output.tables[0].rows[0])",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSqlTable2",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "mani",
+						"type": "Wait",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 60
+						}
+					},
+					{
+						"name": "mani_copy1",
+						"type": "Wait",
+						"dependsOn": [
+							{
+								"activity": "mani",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 12
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"variables": {
+					"var": {
+						"type": "Array"
+					},
+					"json": {
+						"type": "String"
+					},
+					"va2": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "itsfi_sqlmi_dataframework_key01",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "TenantId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SourceSystem",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TimeGenerated",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ResourceId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "OperationName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Category",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CorrelationId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Level",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Location",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Tags",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Status",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UserProperties",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Input",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Output",
+						"type": "varchar"
+					},
+					{
+						"name": "ErrorCode",
+						"type": "varchar"
+					},
+					{
+						"name": "ErrorMessage",
+						"type": "varchar"
+					},
+					{
+						"name": "Annotations",
+						"type": "varchar"
+					},
+					{
+						"name": "EventMessage",
+						"type": "varchar"
+					},
+					{
+						"name": "Start",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "TriggerId",
+						"type": "varchar"
+					},
+					{
+						"name": "TriggerName",
+						"type": "varchar"
+					},
+					{
+						"name": "TriggerType",
+						"type": "varchar"
+					},
+					{
+						"name": "TriggerEvent",
+						"type": "varchar"
+					},
+					{
+						"name": "TriggerFailureType",
+						"type": "varchar"
+					},
+					{
+						"name": "Parameters",
+						"type": "varchar"
+					},
+					{
+						"name": "SystemParametersType",
+						"type": "varchar"
+					},
+					{
+						"name": "_ResourceId",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "LoadControl",
+					"table": "CuratedZone_Log"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DynamicDS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"VaultName": {
+							"value": "@dataset().Vaultname",
+							"type": "Expression"
+						},
+						"SecretName": {
+							"value": "@dataset().SecretName",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"Vaultname": {
+						"type": "String"
+					},
+					"SecretName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Dynamic call')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -78,7 +465,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DynamicDS')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/trigger1')]",
@@ -107,7 +496,9 @@
 					"dependsOn": []
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pipeline1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DynamicPip_Parent')]",
