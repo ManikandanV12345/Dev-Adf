@@ -391,6 +391,54 @@
 								"resource": "https://eventgrid.azure.net/"
 							}
 						}
+					},
+					{
+						"name": "Web1_copy1",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "Web1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://mani.eastus-1.eventgrid.azure.net/api/events",
+							"method": "POST",
+							"headers": {},
+							"body": [
+								{
+									"id": "@{pipeline().RunId}",
+									"eventType": "dyna",
+									"subject": "factories",
+									"eventTime": "@{formatDateTime(utcnow(), 's')}",
+									"data": {
+										"DataFactory": "@{pipeline().DataFactory}",
+										"PipelineName": "@{pipeline().Pipeline}",
+										"PipelineGroupId": "@{pipeline().GroupId}",
+										"PipelineTriggerId": "@{pipeline().GroupId}",
+										"PipelineTriggerName": "@{pipeline().TriggerName}",
+										"PipelineTriggerType": "@{pipeline().TriggerType}",
+										"PipelineTriggeredByPipelineName": "@{pipeline()?.TriggeredByPipelineName}",
+										"PipelineTriggeredByPipelineRunId": "@{pipeline()?.TriggeredByPipelineRunId}"
+									},
+									"dataVersion": "1.0"
+								}
+							],
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://eventgrid.azure.net/"
+							}
+						}
 					}
 				],
 				"policy": {
@@ -1493,6 +1541,13 @@
 							"type": "PipelineReference"
 						},
 						"parameters": {}
+					},
+					{
+						"pipelineReference": {
+							"referenceName": "DynamicPip_Parent",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
 					}
 				],
 				"type": "CustomEventsTrigger",
@@ -1502,12 +1557,13 @@
 					"scope": "[parameters('trigger2_properties_typeProperties_scope')]",
 					"events": [
 						"copyCompleted",
-						"copySucceeded"
+						"dyna"
 					]
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/ListeningCustomevents')]"
+				"[concat(variables('factoryId'), '/pipelines/ListeningCustomevents')]",
+				"[concat(variables('factoryId'), '/pipelines/DynamicPip_Parent')]"
 			]
 		}
 	]
