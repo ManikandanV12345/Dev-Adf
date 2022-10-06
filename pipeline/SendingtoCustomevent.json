@@ -1,5 +1,5 @@
 {
-	"name": "ListeningCustomevents",
+	"name": "SendingtoCustomevent",
 	"properties": {
 		"activities": [
 			{
@@ -15,13 +15,13 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"url": "https://manikandan.eastus-1.eventgrid.azure.net/api/events",
+					"url": "https://mani.eastus-1.eventgrid.azure.net/api/events",
 					"method": "POST",
 					"body": [
 						{
 							"id": "@{pipeline().RunId}",
-							"eventType": "PipelineFinished",
-							"subject": "myapp/pipelines/mydataset",
+							"eventType": "copyCompleted",
+							"subject": "factories",
 							"eventTime": "@{formatDateTime(utcnow(), 's')}",
 							"data": {
 								"DataFactory": "@{pipeline().DataFactory}",
@@ -40,22 +40,6 @@
 						"type": "MSI",
 						"resource": "https://eventgrid.azure.net/"
 					}
-				}
-			},
-			{
-				"name": "Wait1",
-				"type": "Wait",
-				"dependsOn": [
-					{
-						"activity": "Web1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"waitTimeInSeconds": 10
 				}
 			}
 		],
