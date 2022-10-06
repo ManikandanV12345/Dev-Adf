@@ -9,6 +9,12 @@
 					"referenceName": "ListeningCustomevents",
 					"type": "PipelineReference"
 				}
+			},
+			{
+				"pipelineReference": {
+					"referenceName": "DynamicPip_Parent",
+					"type": "PipelineReference"
+				}
 			}
 		],
 		"type": "CustomEventsTrigger",
@@ -18,7 +24,7 @@
 			"scope": "/subscriptions/7f43217e-5dd6-4b9b-8ba6-149b75296777/resourceGroups/itsfirsg/providers/Microsoft.EventGrid/topics/Mani",
 			"events": [
 				"copyCompleted",
-				"copySucceeded"
+				"dyna"
 			]
 		}
 	}
