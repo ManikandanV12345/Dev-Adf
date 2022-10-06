@@ -35,6 +35,9 @@
 		"trigger2_properties_typeProperties_scope": {
 			"value": "/subscriptions/7f43217e-5dd6-4b9b-8ba6-149b75296777/resourceGroups/itsfirsg/providers/Microsoft.EventGrid/topics/Mani"
 		},
+		"trigger3_properties_typeProperties_scope": {
+			"value": "/subscriptions/7f43217e-5dd6-4b9b-8ba6-149b75296777/resourceGroups/itsfirsg/providers/Microsoft.EventGrid/topics/Mani"
+		},
 		"containerUri": {
 			"value": ""
 		},

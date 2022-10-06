@@ -46,6 +46,10 @@
 		"trigger2_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/7f43217e-5dd6-4b9b-8ba6-149b75296777/resourceGroups/itsfirsg/providers/Microsoft.EventGrid/topics/Mani"
+		},
+		"trigger3_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/7f43217e-5dd6-4b9b-8ba6-149b75296777/resourceGroups/itsfirsg/providers/Microsoft.EventGrid/topics/Mani"
 		}
 	},
 	"variables": {
@@ -1541,7 +1545,30 @@
 							"type": "PipelineReference"
 						},
 						"parameters": {}
-					},
+					}
+				],
+				"type": "CustomEventsTrigger",
+				"typeProperties": {
+					"subjectEndsWith": "",
+					"subjectBeginsWith": "factories",
+					"scope": "[parameters('trigger2_properties_typeProperties_scope')]",
+					"events": [
+						"copyCompleted"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/ListeningCustomevents')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger3')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
 					{
 						"pipelineReference": {
 							"referenceName": "DynamicPip_Parent",
@@ -1554,15 +1581,13 @@
 				"typeProperties": {
 					"subjectEndsWith": "",
 					"subjectBeginsWith": "factories",
-					"scope": "[parameters('trigger2_properties_typeProperties_scope')]",
+					"scope": "[parameters('trigger3_properties_typeProperties_scope')]",
 					"events": [
-						"copyCompleted",
 						"dyna"
 					]
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/ListeningCustomevents')]",
 				"[concat(variables('factoryId'), '/pipelines/DynamicPip_Parent')]"
 			]
 		}
