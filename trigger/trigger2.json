@@ -1,0 +1,25 @@
+{
+	"name": "trigger2",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pipeline2",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "CustomEventsTrigger",
+		"typeProperties": {
+			"subjectEndsWith": "",
+			"subjectBeginsWith": "factories",
+			"scope": "/subscriptions/7f43217e-5dd6-4b9b-8ba6-149b75296777/resourceGroups/itsfirsg/providers/Microsoft.EventGrid/topics/Mani",
+			"events": [
+				"copyCompleted",
+				"copySucceeded"
+			]
+		}
+	}
+}
