@@ -21,7 +21,7 @@
 						{
 							"id": "@{pipeline().RunId}",
 							"eventType": "copyCompletedg",
-							"subject": "factories",
+							"subject": "factoriess",
 							"eventTime": "@{formatDateTime(utcnow(), 's')}",
 							"data": {
 								"DataFactory": "@{pipeline().DataFactory}",
