@@ -370,7 +370,7 @@
 							"body": [
 								{
 									"id": "@{pipeline().RunId}",
-									"eventType": "copyCompleted",
+									"eventType": "copyCompletedg",
 									"subject": "factories",
 									"eventTime": "@{formatDateTime(utcnow(), 's')}",
 									"data": {
