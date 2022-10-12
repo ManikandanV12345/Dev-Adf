@@ -21,7 +21,10 @@
 						"type": "Expression"
 					},
 					"method": "POST",
-					"body": "{\nhkhk}",
+					"body": {
+						"value": "@pipeline().parameters.body",
+						"type": "Expression"
+					},
 					"authentication": {
 						"type": "MSI",
 						"resource": "https://management.core.windows.net"
@@ -40,6 +43,9 @@
 				"type": "string"
 			},
 			"PipelineName": {
+				"type": "string"
+			},
+			"body": {
 				"type": "string"
 			}
 		},
