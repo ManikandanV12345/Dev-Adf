@@ -14,6 +14,9 @@
 		"AzureSqlDatabase3_connectionString": {
 			"value": ""
 		},
+		"testing_connectionString": {
+			"value": ""
+		},
 		"AzureKeyVault2_properties_typeProperties_baseUrl": {
 			"value": "https://sqlkyvaults.vault.azure.net/"
 		},

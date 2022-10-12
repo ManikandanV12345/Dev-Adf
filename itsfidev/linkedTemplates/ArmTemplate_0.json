@@ -19,6 +19,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase3'"
 		},
+		"testing_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'testing'"
+		},
 		"AzureKeyVault2_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://sqlkyvaults.vault.azure.net/"
@@ -42,10 +46,6 @@
 		"itsfi_sqlmi_dataframework_key01_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "sqlsecret"
-		},
-		"trigger2_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/7f43217e-5dd6-4b9b-8ba6-149b75296777/resourceGroups/itsfirsg/providers/Microsoft.EventGrid/topics/Mani"
 		}
 	},
 	"variables": {
@@ -229,30 +229,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Wait')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Wait",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": 10
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/Wait1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -326,7 +302,10 @@
 							},
 							"method": "POST",
 							"headers": {},
-							"body": "{\nhkhk}",
+							"body": {
+								"value": "@pipeline().parameters.body",
+								"type": "Expression"
+							},
 							"authentication": {
 								"type": "MSI",
 								"resource": "https://management.core.windows.net"
@@ -350,6 +329,41 @@
 					},
 					"PipelineName": {
 						"type": "string"
+					},
+					"body": {
+						"type": "string"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Wait",
+						"type": "Wait",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": {
+								"value": "@pipeline().parameters.params",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"params": {
+						"type": "object"
 					}
 				},
 				"annotations": []
@@ -427,6 +441,19 @@
 				"type": "AzureKeyVault",
 				"typeProperties": {
 					"baseUrl": "[parameters('DynamicKV_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/testing')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('testing_connectionString')]"
 				}
 			},
 			"dependsOn": []
@@ -521,6 +548,24 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable4')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "testing",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/testing')]"
 			]
 		},
 		{
@@ -627,340 +672,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault2')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/trigger2')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "ListeningCustomevents",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "CustomEventsTrigger",
-				"typeProperties": {
-					"subjectEndsWith": "",
-					"subjectBeginsWith": "factories",
-					"scope": "[parameters('trigger2_properties_typeProperties_scope')]",
-					"events": [
-						"copyCompleted"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/ListeningCustomevents')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Sequence')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Lookup1",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [
-							{
-								"name": "ActivityName",
-								"value": "Lookup1"
-							}
-						],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select * from SEQUENCEMASTER",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "AzureSqlTable3",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup1').output.value",
-								"type": "Expression"
-							},
-							"isSequential": true,
-							"activities": [
-								{
-									"name": "If Condition1",
-									"type": "IfCondition",
-									"dependsOn": [
-										{
-											"activity": "Set variable1",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										},
-										{
-											"activity": "Set variable3",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										},
-										{
-											"activity": "Set variable2",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"userProperties": [],
-									"typeProperties": {
-										"expression": {
-											"value": "@AND(equals(variables('superiror'),'NONE'),not(equals(variables('current'),'NONE')))",
-											"type": "Expression"
-										},
-										"ifFalseActivities": [
-											{
-												"name": "Web_copy1",
-												"type": "ExecutePipeline",
-												"dependsOn": [],
-												"userProperties": [],
-												"typeProperties": {
-													"pipeline": {
-														"referenceName": "Web",
-														"type": "PipelineReference"
-													},
-													"waitOnCompletion": true,
-													"parameters": {
-														"SubscriptionId": {
-															"value": "@pipeline().globalParameters.Subscriptionid",
-															"type": "Expression"
-														},
-														"ResourceGrp": {
-															"value": "@pipeline().globalParameters.ResourceGrp",
-															"type": "Expression"
-														},
-														"DataFactoryName": {
-															"value": "@pipeline().DataFactory",
-															"type": "Expression"
-														},
-														"PipelineName": {
-															"value": "@variables('current')",
-															"type": "Expression"
-														}
-													}
-												}
-											}
-										],
-										"ifTrueActivities": [
-											{
-												"name": "Web",
-												"type": "ExecutePipeline",
-												"dependsOn": [],
-												"userProperties": [],
-												"typeProperties": {
-													"pipeline": {
-														"referenceName": "Web",
-														"type": "PipelineReference"
-													},
-													"waitOnCompletion": true,
-													"parameters": {
-														"SubscriptionId": {
-															"value": "@pipeline().globalParameters.Subscriptionid",
-															"type": "Expression"
-														},
-														"ResourceGrp": {
-															"value": "@pipeline().globalParameters.ResourceGrp",
-															"type": "Expression"
-														},
-														"DataFactoryName": {
-															"value": "@pipeline().DataFactory",
-															"type": "Expression"
-														},
-														"PipelineName": {
-															"value": "@variables('current')",
-															"type": "Expression"
-														}
-													}
-												}
-											},
-											{
-												"name": "Set variable4",
-												"type": "SetVariable",
-												"dependsOn": [
-													{
-														"activity": "Web",
-														"dependencyConditions": [
-															"Succeeded",
-															"Failed"
-														]
-													}
-												],
-												"userProperties": [],
-												"typeProperties": {
-													"variableName": "runid",
-													"value": {
-														"value": "@activity('Web').output.pipelineRunId",
-														"type": "Expression"
-													}
-												}
-											},
-											{
-												"name": "Execute Pipeline1_copy1",
-												"type": "ExecutePipeline",
-												"dependsOn": [
-													{
-														"activity": "Web",
-														"dependencyConditions": [
-															"Succeeded"
-														]
-													}
-												],
-												"userProperties": [],
-												"typeProperties": {
-													"pipeline": {
-														"referenceName": "LoggingPipeline",
-														"type": "PipelineReference"
-													},
-													"waitOnCompletion": true,
-													"parameters": {
-														"PipelineId": {
-															"value": "@pipeline().RunId",
-															"type": "Expression"
-														},
-														"Json": {
-															"value": "@activity('Web').output",
-															"type": "Expression"
-														}
-													}
-												}
-											}
-										]
-									}
-								},
-								{
-									"name": "Set variable1",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "current",
-										"value": {
-											"value": "@item().CURRENT",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Set variable2",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "superiror",
-										"value": {
-											"value": "@item().SUPERIOR",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Set variable3",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "next",
-										"value": {
-											"value": "@item().NEXT",
-											"type": "Expression"
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Execute Pipeline1",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "LoggingPipeline",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"PipelineId": {
-									"value": "@pipeline().RunId",
-									"type": "Expression"
-								},
-								"Json": {
-									"value": "@activity('Lookup1').output.value",
-									"type": "Expression"
-								}
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"variables": {
-					"current": {
-						"type": "String"
-					},
-					"superiror": {
-						"type": "String"
-					},
-					"next": {
-						"type": "String"
-					},
-					"runid": {
-						"type": "String"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/AzureSqlTable3')]",
-				"[concat(variables('factoryId'), '/pipelines/LoggingPipeline')]",
-				"[concat(variables('factoryId'), '/pipelines/Web')]"
 			]
 		}
 	]
