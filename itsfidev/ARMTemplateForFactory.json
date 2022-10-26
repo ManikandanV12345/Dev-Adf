@@ -47,6 +47,10 @@
 			"type": "string",
 			"defaultValue": "sqlsecret"
 		},
+		"trigger2_properties_ListeningCustomevents_parameters_param1": {
+			"type": "string",
+			"defaultValue": "@triggerBody().event.data._keyName_param1"
+		},
 		"trigger2_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/7f43217e-5dd6-4b9b-8ba6-149b75296777/resourceGroups/itsfirsg/providers/Microsoft.EventGrid/topics/Mani"
@@ -237,7 +241,14 @@
 					{
 						"name": "Web1",
 						"type": "WebActivity",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Set variable1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -290,11 +301,34 @@
 						"typeProperties": {
 							"waitTimeInSeconds": 10
 						}
+					},
+					{
+						"name": "Set variable1",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "set",
+							"value": {
+								"value": "@pipeline().parameters.param1",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
+				},
+				"parameters": {
+					"param1": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"set": {
+						"type": "String"
+					}
 				},
 				"annotations": []
 			},
@@ -378,7 +412,7 @@
 							"body": [
 								{
 									"id": "@{pipeline().RunId}",
-									"eventType": "copyCompletedg",
+									"eventType": "copyCompleted",
 									"subject": "factoriess",
 									"eventTime": "@{formatDateTime(utcnow(), 's')}",
 									"data": {
@@ -387,6 +421,7 @@
 										"PipelineGroupId": "@{pipeline().GroupId}",
 										"PipelineTriggerId": "@{pipeline().GroupId}",
 										"PipelineTriggerName": "@{pipeline().TriggerName}",
+										"param1": "@{pipeline().TriggerType}",
 										"PipelineTriggerType": "@{pipeline().TriggerType}",
 										"PipelineTriggeredByPipelineName": "@{pipeline()?.TriggeredByPipelineName}",
 										"PipelineTriggeredByPipelineRunId": "@{pipeline()?.TriggeredByPipelineRunId}"
@@ -452,6 +487,11 @@
 				"policy": {
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
+				},
+				"variables": {
+					"set": {
+						"type": "String"
+					}
 				},
 				"annotations": []
 			},
@@ -1685,7 +1725,9 @@
 							"referenceName": "ListeningCustomevents",
 							"type": "PipelineReference"
 						},
-						"parameters": {}
+						"parameters": {
+							"param1": "[parameters('trigger2_properties_ListeningCustomevents_parameters_param1')]"
+						}
 					}
 				],
 				"type": "CustomEventsTrigger",
