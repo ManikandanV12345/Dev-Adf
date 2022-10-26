@@ -59,6 +59,11 @@
 				}
 			}
 		],
+		"parameters": {
+			"param1": {
+				"type": "string"
+			}
+		},
 		"annotations": []
 	}
 }

@@ -8,6 +8,9 @@
 				"pipelineReference": {
 					"referenceName": "ListeningCustomevents",
 					"type": "PipelineReference"
+				},
+				"parameters": {
+					"param1": "@triggerBody().event.data._keyName_param1"
 				}
 			}
 		],
